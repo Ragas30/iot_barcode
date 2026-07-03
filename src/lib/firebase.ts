@@ -1,5 +1,6 @@
 import { cert, getApps, initializeApp } from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
+import { DatabaseError } from "@/src/lib/errors";
 
 function createFirebaseApp() {
   if (getApps().length > 0) {
@@ -14,16 +15,37 @@ function createFirebaseApp() {
     return null;
   }
 
-  return initializeApp({
-    credential: cert({
-      projectId,
-      clientEmail,
-      privateKey,
-    }),
-  });
+  try {
+    return initializeApp({
+      credential: cert({
+        projectId,
+        clientEmail,
+        privateKey,
+      }),
+    });
+  } catch (error) {
+    const detail =
+      error instanceof Error && error.message
+        ? ` Detail: ${error.message}`
+        : "";
+    throw new DatabaseError(`Konfigurasi Firebase tidak valid.${detail}`);
+  }
 }
 
 export function getDb() {
   const app = createFirebaseApp();
-  return app ? getFirestore(app) : null;
+
+  if (!app) {
+    return null;
+  }
+
+  try {
+    return getFirestore(app);
+  } catch (error) {
+    const detail =
+      error instanceof Error && error.message
+        ? ` Detail: ${error.message}`
+        : "";
+    throw new DatabaseError(`Gagal menginisialisasi Firestore.${detail}`);
+  }
 }

@@ -58,20 +58,24 @@ export class AdminRepository {
     try {
       await db.collection("admins").doc(seedAdmin.id).set(seedAdmin);
       return seedAdmin;
-    } catch {
-      throw new DatabaseError("Gagal membuat admin awal.");
+    } catch (error) {
+      const detail =
+        error instanceof Error && error.message
+          ? ` Detail: ${error.message}`
+          : "";
+      throw new DatabaseError(`Gagal membuat admin awal.${detail}`);
     }
   }
 
   async findByEmail(email: string) {
-    const db = getDb();
-
-    if (!db) {
-      await ensureSeededAdmin();
-      return memoryAdmins.get(email) ?? null;
-    }
-
     try {
+      const db = getDb();
+
+      if (!db) {
+        await ensureSeededAdmin();
+        return memoryAdmins.get(email) ?? null;
+      }
+
       const snapshot = await db
         .collection("admins")
         .where("email", "==", email)
@@ -81,8 +85,12 @@ export class AdminRepository {
         return this.ensureFirestoreSeededAdmin(email);
       }
       return snapshot.docs[0].data() as Admin;
-    } catch {
-      throw new DatabaseError("Gagal mencari admin.");
+    } catch (error) {
+      const detail =
+        error instanceof Error && error.message
+          ? ` Detail: ${error.message}`
+          : "";
+      throw new DatabaseError(`Gagal mencari admin.${detail}`);
     }
   }
 }

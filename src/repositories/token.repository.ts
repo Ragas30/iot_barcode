@@ -6,29 +6,33 @@ const memoryTokens = new Map<string, TokenRecord>();
 
 export class TokenRepository {
   async create(record: TokenRecord) {
-    const db = getDb();
-
-    if (!db) {
-      memoryTokens.set(record.token, record);
-      return record;
-    }
-
     try {
+      const db = getDb();
+
+      if (!db) {
+        memoryTokens.set(record.token, record);
+        return record;
+      }
+
       await db.collection("tokens").doc(record.id).set(record);
       return record;
-    } catch {
-      throw new DatabaseError("Gagal menyimpan token.");
+    } catch (error) {
+      const detail =
+        error instanceof Error && error.message
+          ? ` Detail: ${error.message}`
+          : "";
+      throw new DatabaseError(`Gagal menyimpan token.${detail}`);
     }
   }
 
   async findByToken(token: string) {
-    const db = getDb();
-
-    if (!db) {
-      return memoryTokens.get(token) ?? null;
-    }
-
     try {
+      const db = getDb();
+
+      if (!db) {
+        return memoryTokens.get(token) ?? null;
+      }
+
       const snapshot = await db
         .collection("tokens")
         .where("token", "==", token)
@@ -38,21 +42,25 @@ export class TokenRepository {
         return null;
       }
       return snapshot.docs[0].data() as TokenRecord;
-    } catch {
-      throw new DatabaseError("Gagal mencari token.");
+    } catch (error) {
+      const detail =
+        error instanceof Error && error.message
+          ? ` Detail: ${error.message}`
+          : "";
+      throw new DatabaseError(`Gagal mencari token.${detail}`);
     }
   }
 
   async listByType(type: TokenType) {
-    const db = getDb();
-
-    if (!db) {
-      return Array.from(memoryTokens.values())
-        .filter((item) => item.type === type)
-        .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
-    }
-
     try {
+      const db = getDb();
+
+      if (!db) {
+        return Array.from(memoryTokens.values())
+          .filter((item) => item.type === type)
+          .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+      }
+
       const snapshot = await db
         .collection("tokens")
         .where("type", "==", type)
@@ -60,8 +68,12 @@ export class TokenRepository {
       return snapshot.docs
         .map((doc) => doc.data() as TokenRecord)
         .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
-    } catch {
-      throw new DatabaseError("Gagal mengambil daftar token.");
+    } catch (error) {
+      const detail =
+        error instanceof Error && error.message
+          ? ` Detail: ${error.message}`
+          : "";
+      throw new DatabaseError(`Gagal mengambil daftar token.${detail}`);
     }
   }
 }
