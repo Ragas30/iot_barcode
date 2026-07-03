@@ -131,12 +131,12 @@ const endpoints: ApiEndpoint[] = [
     method: "POST",
     path: "/api/qr",
     title: "Generate QR",
-    description: "Buat QR code baru dengan token unik. Token aktif selama 1 menit.",
+    description: "Buat QR code baru dengan token unik. Tidak perlu body, cukup kirim POST request. Token aktif selama 1 menit.",
     auth: "JWT Cookie",
     rateLimit: "15 req / menit",
     request: {
       headers: { "Content-Type": "application/json" },
-      body: { name: "Pintu Gudang A" },
+      body: {},
     },
     responses: [
       {
@@ -148,7 +148,7 @@ const endpoints: ApiEndpoint[] = [
           data: {
             id: "tok_abc123",
             adminId: "abc123",
-            name: "Pintu Gudang A",
+            name: "QR Token",
             token: "a1b2c3d4e5f6...",
             type: "qr",
             status: "active",
@@ -193,75 +193,10 @@ const endpoints: ApiEndpoint[] = [
     ],
   },
   {
-    method: "POST",
-    path: "/api/barcode",
-    title: "Generate Barcode",
-    description: "Buat barcode Code128 baru dengan token unik. Token aktif selama 1 menit.",
-    auth: "JWT Cookie",
-    rateLimit: "15 req / menit",
-    request: {
-      headers: { "Content-Type": "application/json" },
-      body: { name: "Scanner Kasir 1" },
-    },
-    responses: [
-      {
-        status: 201,
-        label: "Created",
-        body: {
-          success: true,
-          message: "Barcode berhasil dibuat.",
-          data: {
-            id: "tok_xyz789",
-            adminId: "abc123",
-            name: "Scanner Kasir 1",
-            token: "x7y8z9...",
-            type: "barcode",
-            status: "active",
-            createdAt: "2026-07-03T10:00:00.000Z",
-            expiredAt: "2026-07-03T10:01:00.000Z",
-            image: "data:image/png;base64,...",
-            payload: "x7y8z9...",
-            verifyEndpoint: "http://localhost:3000/api/verify_qr",
-          },
-        },
-      },
-    ],
-  },
-  {
-    method: "GET",
-    path: "/api/barcode",
-    title: "List Barcode Tokens",
-    description: "Ambil semua barcode token milik admin yang sedang login.",
-    auth: "JWT Cookie",
-    rateLimit: "60 req / menit",
-    responses: [
-      {
-        status: 200,
-        label: "Success",
-        body: {
-          success: true,
-          message: "Daftar barcode berhasil diambil.",
-          data: [
-            {
-              id: "tok_xyz789",
-              adminId: "abc123",
-              name: "Scanner Kasir 1",
-              token: "x7y8z9...",
-              type: "barcode",
-              status: "expired",
-              createdAt: "2026-07-03T10:00:00.000Z",
-              expiredAt: "2026-07-03T10:01:00.000Z",
-            },
-          ],
-        },
-      },
-    ],
-  },
-  {
     method: "GET",
     path: "/api/validate?token={token}",
     title: "Validate Token",
-    description: "Validasi token QR/barcode. Dipakai IoT device untuk cek apakah token masih aktif.",
+    description: "Validasi token QR. Dipakai IoT device untuk cek apakah token masih aktif.",
     auth: "Public",
     rateLimit: "120 req / menit",
     request: {
