@@ -1,17 +1,34 @@
+import Link from "next/link";
 import { PageShell } from "@/src/components/common/page-shell";
+import {
+  Card,
+  CardContent,
+  CardTitle,
+  CardDescription,
+} from "@/src/components/ui/card";
+import { Button } from "@/src/components/ui/button";
 
 const cards = [
   {
-    title: "Auth Flow",
-    description: "JWT disimpan pada HttpOnly cookie untuk akses dashboard admin.",
+    title: "Generate QR",
+    description:
+      "Buat QR autentikasi baru dan simpan record-nya ke Firebase untuk dipakai alat.",
+    href: "/dashboard/qr",
+    cta: "Buka Generator",
   },
   {
-    title: "Token Generator",
-    description: "QR dan barcode dibuat on-demand, metadata disimpan, image tidak disimpan.",
+    title: "History QR",
+    description:
+      "Lihat semua QR yang pernah dibuat user ini beserta status aktif atau expired.",
+    href: "/dashboard/history-qr",
+    cta: "Lihat History",
   },
   {
-    title: "Validation API",
-    description: "Perangkat IoT cukup memanggil endpoint validate dengan token aktif.",
+    title: "Setup PIN",
+    description:
+      "Atur PIN akun yang akan diverifikasi alat sebelum sesi scan QR dimulai.",
+    href: "/dashboard/pin",
+    cta: "Atur PIN",
   },
 ];
 
@@ -19,17 +36,21 @@ export default function DashboardPage() {
   return (
     <PageShell
       title="Dashboard Overview"
-      description="Fondasi sistem sudah disusun mengikuti PRD: layered architecture, auth middleware, generator QR/barcode, dan endpoint validasi token."
+      description="Flow utama sistem sekarang berpusat di PIN alat dan autentikasi QR. Semua data user, PIN, dan QR disimpan ke Firebase."
     >
       <div className="grid gap-4 md:grid-cols-3">
         {cards.map((card) => (
-          <article
-            key={card.title}
-            className="rounded-[1.75rem] border border-slate-200 bg-white p-5 shadow-[0_20px_50px_rgba(15,23,42,0.06)]"
-          >
-            <h2 className="text-lg font-semibold text-slate-950">{card.title}</h2>
-            <p className="mt-3 text-sm leading-7 text-slate-600">{card.description}</p>
-          </article>
+          <Card key={card.title}>
+            <CardContent>
+              <CardTitle>{card.title}</CardTitle>
+              <CardDescription className="mt-3">
+                {card.description}
+              </CardDescription>
+              <Link href={card.href} className="mt-5 inline-block">
+                <Button size="pill">{card.cta}</Button>
+              </Link>
+            </CardContent>
+          </Card>
         ))}
       </div>
     </PageShell>

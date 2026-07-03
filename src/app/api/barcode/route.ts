@@ -14,8 +14,8 @@ export function OPTIONS(request: Request) {
 export async function GET(request: Request) {
   try {
     enforceRateLimit(request, "barcode-list", 60, 60_000);
-    await requireAuth();
-    const data = await controller.list("barcode");
+    const auth = await requireAuth();
+    const data = await controller.list("barcode", auth.sub);
     return successResponse("Daftar barcode berhasil diambil.", data, 200, request);
   } catch (error) {
     return handleRouteError(error, {
@@ -29,9 +29,9 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     enforceRateLimit(request, "barcode-create", 15, 60_000);
-    await requireAuth();
+    const auth = await requireAuth();
     const body = await request.json();
-    const data = await controller.create(body, "barcode");
+    const data = await controller.create(auth.sub, body, "barcode");
     return successResponse("Barcode berhasil dibuat.", data, 201, request);
   } catch (error) {
     return handleRouteError(error, {

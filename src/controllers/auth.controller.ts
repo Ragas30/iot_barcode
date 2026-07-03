@@ -2,6 +2,7 @@ import { cookies } from "next/headers";
 import { AUTH_COOKIE_NAME } from "@/src/constants/auth";
 import { AuthService } from "@/src/services/auth.service";
 import { loginSchema } from "@/src/validators/auth";
+import { setupPinSchema, verifyPinSchema } from "@/src/validators/token";
 
 export class AuthController {
   constructor(private readonly authService = new AuthService()) {}
@@ -23,5 +24,15 @@ export class AuthController {
   async logout() {
     const cookieStore = await cookies();
     cookieStore.delete(AUTH_COOKIE_NAME);
+  }
+
+  async setupPin(adminId: string, payload: unknown) {
+    const parsed = setupPinSchema.parse(payload);
+    return this.authService.setupPin(adminId, parsed.pin);
+  }
+
+  async verifyPin(payload: unknown) {
+    const parsed = verifyPinSchema.parse(payload);
+    return this.authService.verifyPin(parsed.adminId, parsed.pin);
   }
 }

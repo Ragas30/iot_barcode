@@ -1,5 +1,9 @@
 import type { ReactNode } from "react";
 
+/* ------------------------------------------------------------------ */
+/*  PageShell – page header + content wrapper                         */
+/* ------------------------------------------------------------------ */
+
 export function PageShell({
   title,
   description,

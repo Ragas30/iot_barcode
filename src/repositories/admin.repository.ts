@@ -20,6 +20,8 @@ async function ensureSeededAdmin() {
     name: "System Admin",
     email,
     password: hashed,
+    pin: null,
+    pinUpdatedAt: null,
     createdAt: now,
   };
   memoryAdmins.set(admin.email, admin);
@@ -36,6 +38,8 @@ async function buildSeedAdmin() {
     name: "System Admin",
     email,
     password: hashed,
+    pin: null,
+    pinUpdatedAt: null,
     createdAt: now,
   } satisfies Admin;
 }
@@ -91,6 +95,63 @@ export class AdminRepository {
           ? ` Detail: ${error.message}`
           : "";
       throw new DatabaseError(`Gagal mencari admin.${detail}`);
+    }
+  }
+
+  async findById(id: string) {
+    try {
+      const db = getDb();
+
+      if (!db) {
+        await ensureSeededAdmin();
+        return Array.from(memoryAdmins.values()).find((admin) => admin.id === id) ?? null;
+      }
+
+      const snapshot = await db.collection("admins").doc(id).get();
+
+      if (!snapshot.exists) {
+        return null;
+      }
+
+      return snapshot.data() as Admin;
+    } catch (error) {
+      const detail =
+        error instanceof Error && error.message
+          ? ` Detail: ${error.message}`
+          : "";
+      throw new DatabaseError(`Gagal mencari admin berdasarkan id.${detail}`);
+    }
+  }
+
+  async updatePin(id: string, pin: string) {
+    const admin = await this.findById(id);
+
+    if (!admin) {
+      return null;
+    }
+
+    const updatedAdmin: Admin = {
+      ...admin,
+      pin,
+      pinUpdatedAt: new Date().toISOString(),
+    };
+
+    try {
+      const db = getDb();
+
+      if (!db) {
+        memoryAdmins.set(updatedAdmin.email, updatedAdmin);
+        return updatedAdmin;
+      }
+
+      await db.collection("admins").doc(updatedAdmin.id).set(updatedAdmin);
+      return updatedAdmin;
+    } catch (error) {
+      const detail =
+        error instanceof Error && error.message
+          ? ` Detail: ${error.message}`
+          : "";
+      throw new DatabaseError(`Gagal menyimpan PIN admin.${detail}`);
     }
   }
 }

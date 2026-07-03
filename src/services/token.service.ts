@@ -8,10 +8,11 @@ import type { TokenRecord, TokenType } from "@/src/types/entities";
 export class TokenService {
   constructor(private readonly tokenRepository = new TokenRepository()) {}
 
-  async create(name: string, type: TokenType) {
+  async create(adminId: string, name: string, type: TokenType) {
     const token = generateTokenValue();
     const record: TokenRecord = {
       id: generateId(),
+      adminId,
       name,
       token,
       type,
@@ -22,18 +23,20 @@ export class TokenService {
 
     await this.tokenRepository.create(record);
 
-    const payload = `${process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000"}/api/validate?token=${token}`;
+    const payload = token;
+    const verifyEndpoint = `${process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000"}/api/verify_qr`;
     const image = type === "qr" ? await QRCode.toDataURL(payload) : await this.generateBarcode(payload);
 
     return {
       ...record,
       image,
       payload,
+      verifyEndpoint,
     };
   }
 
-  async list(type: TokenType) {
-    const records = await this.tokenRepository.listByType(type);
+  async list(type: TokenType, adminId?: string) {
+    const records = await this.tokenRepository.listByType(type, adminId);
     return records.map((record) => ({
       ...record,
       status: isExpired(record.expiredAt) ? "expired" : record.status,
@@ -51,6 +54,22 @@ export class TokenService {
     }
 
     return record;
+  }
+
+  async verifyQr(token: string) {
+    const record = await this.validate(token);
+
+    if (record.type !== "qr") {
+      throw new NotFoundError("Kode QR tidak ditemukan.");
+    }
+
+    return {
+      valid: true,
+      token: record.token,
+      adminId: record.adminId,
+      name: record.name,
+      expiredAt: record.expiredAt,
+    };
   }
 
   private async generateBarcode(text: string) {

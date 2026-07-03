@@ -5,3 +5,20 @@ export const createTokenSchema = z.object({
 });
 
 export type CreateTokenInput = z.infer<typeof createTokenSchema>;
+
+export const verifyTokenSchema = z.object({
+  token: z.string().min(1, "Token wajib diisi."),
+});
+
+export const setupPinSchema = z.object({
+  pin: z
+    .string()
+    .regex(/^\d{4,8}$/, "PIN harus 4-8 digit angka."),
+});
+
+export const verifyPinSchema = z.object({
+  adminId: z.string().min(1, "Admin id wajib diisi."),
+  pin: z
+    .string()
+    .regex(/^\d{4,8}$/, "PIN harus 4-8 digit angka."),
+});

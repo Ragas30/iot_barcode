@@ -6,6 +6,8 @@ export type Admin = {
   name: string;
   email: string;
   password: string;
+  pin?: string | null;
+  pinUpdatedAt?: string | null;
   createdAt: string;
 };
 
@@ -17,6 +19,7 @@ export type AuthPayload = {
 
 export type TokenRecord = {
   id: string;
+  adminId: string;
   name: string;
   token: string;
   type: TokenType;

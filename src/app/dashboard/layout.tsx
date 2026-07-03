@@ -1,8 +1,9 @@
 import type { ReactNode } from "react";
 import { redirect } from "next/navigation";
-import { LogoutButton } from "@/src/components/dashboard/logout-button";
+import { DashboardHeader } from "@/src/components/dashboard/header";
 import { Sidebar } from "@/src/components/dashboard/sidebar";
 import { requireAuth } from "@/src/middleware/auth";
+import { Card } from "@/src/components/ui/card";
 
 export default async function DashboardLayout({
   children,
@@ -16,15 +17,13 @@ export default async function DashboardLayout({
   }
 
   return (
-    <main className="min-h-screen px-6 py-6">
+    <main className="min-h-screen px-4 py-4 sm:px-6 sm:py-6">
       <div className="mx-auto grid max-w-7xl gap-6 lg:grid-cols-[260px_1fr]">
         <Sidebar />
-        <div className="rounded-[2rem] border border-white/60 bg-[var(--color-panel)] p-6 shadow-[0_20px_80px_rgba(15,23,42,0.08)] backdrop-blur">
-          <div className="mb-6 flex items-center justify-end">
-            <LogoutButton />
-          </div>
-          {children}
-        </div>
+        <Card variant="outlined" className="min-w-0">
+          <DashboardHeader />
+          <div className="mt-6">{children}</div>
+        </Card>
       </div>
     </main>
   );

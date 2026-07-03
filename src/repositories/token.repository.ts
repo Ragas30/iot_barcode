@@ -51,20 +51,24 @@ export class TokenRepository {
     }
   }
 
-  async listByType(type: TokenType) {
+  async listByType(type: TokenType, adminId?: string) {
     try {
       const db = getDb();
 
       if (!db) {
         return Array.from(memoryTokens.values())
+          .filter((item) => (adminId ? item.adminId === adminId : true))
           .filter((item) => item.type === type)
           .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
       }
 
-      const snapshot = await db
-        .collection("tokens")
-        .where("type", "==", type)
-        .get();
+      let query = db.collection("tokens").where("type", "==", type);
+
+      if (adminId) {
+        query = query.where("adminId", "==", adminId);
+      }
+
+      const snapshot = await query.get();
       return snapshot.docs
         .map((doc) => doc.data() as TokenRecord)
         .sort((a, b) => b.createdAt.localeCompare(a.createdAt));

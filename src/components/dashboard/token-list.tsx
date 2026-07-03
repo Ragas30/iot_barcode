@@ -1,4 +1,7 @@
 import type { TokenRecord, TokenType } from "@/src/types/entities";
+import { Card, CardTitle, CardDescription } from "@/src/components/ui/card";
+import { Badge } from "@/src/components/ui/badge";
+import { EmptyState } from "@/src/components/ui/empty-state";
 
 function formatDate(value: string) {
   return new Intl.DateTimeFormat("id-ID", {
@@ -19,26 +22,26 @@ export function TokenList({
   tokens: TokenRecord[];
   type: TokenType;
 }) {
+  const label = type === "qr" ? "QR" : "Barcode";
+
   return (
-    <section className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-[0_20px_50px_rgba(15,23,42,0.06)]">
+    <Card>
       <div className="flex items-center justify-between gap-4">
         <div>
-          <h3 className="text-lg font-semibold text-slate-950">
-            Recent {type === "qr" ? "QR" : "Barcode"} Tokens
-          </h3>
-          <p className="mt-1 text-sm text-slate-600">
+          <CardTitle>Recent {label} Tokens</CardTitle>
+          <CardDescription className="mt-1">
             Metadata tersimpan, image dihasilkan saat request create.
-          </p>
+          </CardDescription>
         </div>
-        <div className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold uppercase tracking-[0.24em] text-slate-600">
+        <Badge variant="neutral" className="tracking-[0.24em]">
           {tokens.length} items
-        </div>
+        </Badge>
       </div>
 
       {tokens.length === 0 ? (
-        <div className="mt-6 rounded-[1.5rem] border border-dashed border-slate-300 bg-slate-50 px-6 py-12 text-center text-sm text-slate-500">
+        <EmptyState className="mt-6">
           Belum ada token {type}.
-        </div>
+        </EmptyState>
       ) : (
         <div className="mt-6 overflow-hidden rounded-[1.5rem] border border-slate-200">
           <div className="grid grid-cols-[1.3fr_1fr_1fr_0.8fr] gap-4 bg-slate-950 px-4 py-3 text-xs font-semibold uppercase tracking-[0.22em] text-slate-300">
@@ -57,20 +60,20 @@ export function TokenList({
                 >
                   <div>
                     <p className="font-semibold text-slate-950">{token.name}</p>
-                    <p className="mt-1 truncate text-xs text-slate-500">{token.token}</p>
+                    <p className="mt-1 truncate text-xs text-slate-500">
+                      {token.token}
+                    </p>
                   </div>
                   <span>{formatDate(token.createdAt)}</span>
                   <span>{formatDate(token.expiredAt)}</span>
                   <span>
-                    <span
-                      className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] ${
-                        status === "expired"
-                          ? "bg-rose-100 text-rose-700"
-                          : "bg-emerald-100 text-emerald-700"
-                      }`}
+                    <Badge
+                      variant={
+                        status === "expired" ? "destructive" : "success"
+                      }
                     >
                       {status}
-                    </span>
+                    </Badge>
                   </span>
                 </div>
               );
@@ -78,6 +81,6 @@ export function TokenList({
           </div>
         </div>
       )}
-    </section>
+    </Card>
   );
 }
