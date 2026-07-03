@@ -22,4 +22,8 @@ export class TokenController {
     const parsed = verifyTokenSchema.parse(payload);
     return this.tokenService.verifyQr(parsed.token);
   }
+
+  async clearByType(type: TokenType, adminId: string) {
+    return this.tokenService.clearByType(type, adminId);
+  }
 }
