@@ -154,4 +154,27 @@ export class AdminRepository {
       throw new DatabaseError(`Gagal menyimpan PIN admin.${detail}`);
     }
   }
-}
+  async findByPin(pin: string) {
+    try {
+      const db = getDb();
+
+      if (!db) {
+        await ensureSeededAdmin();
+        // In memory, we need to compare the pin (in memory storage won't have encrypted pins for this example)
+        return null;
+      }
+
+      // Note: In production, you should NOT query by hashed password directly
+      // This method is called from service which will compare the plain pin
+      // against stored hashed pins. We just need to get all admins and let
+      // the service handle the comparison.
+      const snapshot = await db.collection("admins").get();
+      return snapshot.docs.map((doc) => doc.data() as Admin);
+    } catch (error) {
+      const detail =
+        error instanceof Error && error.message
+          ? ` Detail: ${error.message}`
+          : "";
+      throw new DatabaseError(`Gagal mencari admin berdasarkan PIN.${detail}`);
+    }
+  }}

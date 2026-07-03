@@ -289,15 +289,15 @@ const endpoints: ApiEndpoint[] = [
     ],
   },
   {
-    method: "POST",
-    path: "/api/verify_pin",
+    method: "GET",
+    path: "/api/verify_pin?pin=123456",
     title: "Verify PIN",
-    description: "Verifikasi PIN perangkat. Dipakai IoT device sebelum memulai sesi scan QR.",
+    description: "Verifikasi PIN perangkat. Dipakai IoT device sebelum memulai sesi scan QR. Server akan menemukan admin berdasarkan PIN.",
     auth: "Public",
     rateLimit: "120 req / menit",
     request: {
       headers: { "Content-Type": "application/json" },
-      body: { adminId: "abc123", pin: "123456" },
+      params: { pin: "123456" },
     },
     responses: [
       {
@@ -318,7 +318,7 @@ const endpoints: ApiEndpoint[] = [
         label: "Invalid PIN",
         body: {
           success: false,
-          message: "Incorrect pin",
+          message: "PIN tidak valid.",
           error: { code: "AUTHENTICATION_ERROR" },
         },
       },
