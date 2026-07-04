@@ -10,16 +10,18 @@ export function OPTIONS(request: Request) {
   return createCorsPreflightResponse(request);
 }
 
-export async function POST(request: Request) {
+export async function GET(request: Request) {
   try {
     enforceRateLimit(request, "verify-qr", 120, 60_000);
-    const body = await request.json();
-    const data = await controller.verifyQr(body);
+    const { searchParams } = new URL(request.url);
+    const token = searchParams.get("token");
+    
+    const data = await controller.verifyQr({ token });
     return successResponse("QR valid.", data, 200, request);
   } catch (error) {
     return handleRouteError(error, {
       endpoint: "/api/verify_qr",
-      method: "POST",
+      method: "GET",
       request,
     });
   }

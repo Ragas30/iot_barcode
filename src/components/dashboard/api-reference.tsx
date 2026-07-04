@@ -242,15 +242,15 @@ const endpoints: ApiEndpoint[] = [
     ],
   },
   {
-    method: "POST",
-    path: "/api/verify_qr",
+    method: "GET",
+    path: "/api/verify_qr?token=a1b2c3d4e5f6...",
     title: "Verify QR",
     description: "Verifikasi spesifik QR token. Endpoint ini dipanggil oleh IoT device setelah scan.",
     auth: "Public",
     rateLimit: "120 req / menit",
     request: {
       headers: { "Content-Type": "application/json" },
-      body: { token: "a1b2c3d4e5f6..." },
+      params: { token: "a1b2c3d4e5f6..." },
     },
     responses: [
       {
