@@ -30,6 +30,10 @@ export async function DELETE(request: NextRequest) {
       { status: 200 }
     );
   } catch (error) {
-    return handleRouteError(error);
+    return handleRouteError(error, {
+      endpoint: "/api/token/clear",
+      method: "DELETE",
+      request,
+    });
   }
 }

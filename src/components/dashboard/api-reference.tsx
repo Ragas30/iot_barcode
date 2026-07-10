@@ -250,7 +250,7 @@ const endpoints: ApiEndpoint[] = [
     rateLimit: "120 req / menit",
     request: {
       headers: { "Content-Type": "application/json" },
-      params: { token: "a1b2c3d4e5f6..." },
+      query: { token: "a1b2c3d4e5f6..." },
     },
     responses: [
       {
@@ -297,7 +297,7 @@ const endpoints: ApiEndpoint[] = [
     rateLimit: "120 req / menit",
     request: {
       headers: { "Content-Type": "application/json" },
-      params: { pin: "123456" },
+      query: { pin: "123456" },
     },
     responses: [
       {
