@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Card, CardTitle, CardDescription } from "@/src/components/ui/card";
 import { Button } from "@/src/components/ui/button";
 import { FormMessage } from "@/src/components/ui/input";
@@ -21,6 +21,32 @@ export function TokenGenerator({ type }: { type: "qr" }) {
   const [result, setResult] = useState<GeneratedToken | null>(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [timeLeft, setTimeLeft] = useState<string>("00:00");
+
+  useEffect(() => {
+    if (!result) return;
+
+    const updateTimer = () => {
+      const now = new Date().getTime();
+      const expireTime = new Date(result.expiredAt).getTime();
+      const diff = expireTime - now;
+
+      if (diff <= 0) {
+        setTimeLeft("00:00");
+        setResult(null);
+        return;
+      }
+
+      const minutes = Math.floor(diff / 60000);
+      const seconds = Math.floor((diff % 60000) / 1000);
+      setTimeLeft(`${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`);
+    };
+
+    updateTimer();
+    const interval = setInterval(updateTimer, 1000);
+
+    return () => clearInterval(interval);
+  }, [result]);
 
   async function onGenerate() {
     setLoading(true);
@@ -67,15 +93,23 @@ export function TokenGenerator({ type }: { type: "qr" }) {
       <Card variant="dashed">
         {result ? (
           <div className="space-y-4">
-            <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white p-4">
-              <Image
-                src={result.image}
-                alt={`${type} preview`}
-                width={640}
-                height={640}
-                unoptimized
-                className="max-h-80 w-auto"
-              />
+            <div className="flex justify-center">
+              <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white p-4">
+                <Image
+                  src={result.image}
+                  alt={`${type} preview`}
+                  width={640}
+                  height={640}
+                  unoptimized
+                  className="max-h-80 w-auto"
+                />
+              </div>
+            </div>
+            <div className="flex items-center justify-center">
+              <div className="rounded-lg bg-slate-900 px-3 py-2 text-center">
+                <p className="text-[10px] font-semibold text-slate-400">Time Left</p>
+                <p className="text-lg font-bold text-white font-mono tracking-wider">{timeLeft}</p>
+              </div>
             </div>
             <div className="grid gap-2 text-sm text-slate-700">
               <p>

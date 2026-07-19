@@ -4,7 +4,7 @@ import type { ButtonHTMLAttributes, ReactNode } from "react";
 /*  Button – reusable button with variants                            */
 /* ------------------------------------------------------------------ */
 
-type ButtonVariant = "primary" | "outline" | "ghost";
+type ButtonVariant = "primary" | "outline" | "ghost" | "destructive";
 type ButtonSize = "default" | "sm" | "pill";
 
 const base =
@@ -16,6 +16,8 @@ const variants: Record<ButtonVariant, string> = {
   outline:
     "border border-slate-200 bg-white text-slate-700 hover:border-slate-950 hover:text-slate-950",
   ghost: "text-slate-600 hover:bg-slate-100 hover:text-slate-900",
+  destructive:
+    "bg-red-600 text-white hover:bg-red-700 disabled:bg-red-400 disabled:opacity-100",
 };
 
 const sizes: Record<ButtonSize, string> = {

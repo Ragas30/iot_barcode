@@ -110,10 +110,10 @@ export function PinSetupForm({ profile }: { profile: PinProfile }) {
           <div className="rounded-[1.5rem] bg-slate-50 p-4 text-slate-600">
             <p className="font-semibold text-slate-900">Endpoint alat</p>
             <p className="mt-2">
-              <code>POST /api/verify_pin</code>
+              <code>GET /api/verify_pin</code>
             </p>
             <p className="mt-2 break-all">
-              <code>{`{"adminId":"${profile.id}","pin":"123456"}`}</code>
+              <code>{`/api/verify_pin?pin=123456`}</code>
             </p>
           </div>
         </div>

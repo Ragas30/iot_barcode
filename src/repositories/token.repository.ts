@@ -80,4 +80,42 @@ export class TokenRepository {
       throw new DatabaseError(`Gagal mengambil daftar token.${detail}`);
     }
   }
+
+  async deleteByType(type: TokenType, adminId: string) {
+    try {
+      const db = getDb();
+
+      if (!db) {
+        for (const [key, value] of memoryTokens.entries()) {
+          if (value.type === type && value.adminId === adminId) {
+            memoryTokens.delete(key);
+          }
+        }
+        return { deletedCount: 0 };
+      }
+
+      const snapshot = await db
+        .collection("tokens")
+        .where("type", "==", type)
+        .where("adminId", "==", adminId)
+        .get();
+
+      const batch = db.batch();
+      let deletedCount = 0;
+
+      snapshot.docs.forEach((doc) => {
+        batch.delete(doc.ref);
+        deletedCount++;
+      });
+
+      await batch.commit();
+      return { deletedCount };
+    } catch (error) {
+      const detail =
+        error instanceof Error && error.message
+          ? ` Detail: ${error.message}`
+          : "";
+      throw new DatabaseError(`Gagal menghapus token.${detail}`);
+    }
+  }
 }

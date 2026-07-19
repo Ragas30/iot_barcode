@@ -52,23 +52,33 @@ export class AuthService {
     };
   }
 
-  async verifyPin(adminId: string, pin: string) {
-    const admin = await this.adminRepository.findById(adminId);
+  async verifyPin(pin: string) {
+    const admins = await this.adminRepository.findByPin(pin);
 
-    if (!admin || !admin.pin) {
-      throw new AuthenticationError("PIN belum diatur.");
+    if (!admins || admins.length === 0) {
+      throw new AuthenticationError("PIN tidak valid.");
     }
 
-    const isMatch = await comparePassword(pin, admin.pin);
+    // Find the admin with matching PIN
+    let matchedAdmin: any = null;
+    for (const admin of admins) {
+      if (admin.pin) {
+        const isMatch = await comparePassword(pin, admin.pin);
+        if (isMatch) {
+          matchedAdmin = admin;
+          break;
+        }
+      }
+    }
 
-    if (!isMatch) {
-      throw new AuthenticationError("Incorrect pin");
+    if (!matchedAdmin) {
+      throw new AuthenticationError("PIN tidak valid.");
     }
 
     return {
       valid: true,
-      adminId: admin.id,
-      name: admin.name,
+      adminId: matchedAdmin.id,
+      name: matchedAdmin.name,
     };
   }
 }

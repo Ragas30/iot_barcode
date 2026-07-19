@@ -33,6 +33,6 @@ export class AuthController {
 
   async verifyPin(payload: unknown) {
     const parsed = verifyPinSchema.parse(payload);
-    return this.authService.verifyPin(parsed.adminId, parsed.pin);
+    return this.authService.verifyPin(parsed.pin);
   }
 }

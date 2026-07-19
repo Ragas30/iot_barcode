@@ -72,6 +72,10 @@ export class TokenService {
     };
   }
 
+  async clearByType(type: TokenType, adminId: string) {
+    return this.tokenRepository.deleteByType(type, adminId);
+  }
+
   private async generateBarcode(text: string) {
     const png = await bwipjs.toBuffer({
       bcid: "code128",

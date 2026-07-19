@@ -1,7 +1,11 @@
+"use client";
+
+import { useState } from "react";
 import type { TokenRecord, TokenType } from "@/src/types/entities";
 import { Card, CardTitle, CardDescription } from "@/src/components/ui/card";
 import { Badge } from "@/src/components/ui/badge";
 import { EmptyState } from "@/src/components/ui/empty-state";
+import { Button } from "@/src/components/ui/button";
 
 function formatDate(value: string) {
   return new Intl.DateTimeFormat("id-ID", {
@@ -16,13 +20,43 @@ function getStatus(token: TokenRecord) {
 }
 
 export function TokenList({
-  tokens,
+  tokens: initialTokens,
   type,
 }: {
   tokens: TokenRecord[];
   type: TokenType;
 }) {
+  const [tokens, setTokens] = useState(initialTokens);
+  const [isClearing, setIsClearing] = useState(false);
   const label = type === "qr" ? "QR" : "Barcode";
+
+  const handleClear = async () => {
+    if (!confirm(`Apakah Anda yakin ingin menghapus semua ${label} tokens?`)) {
+      return;
+    }
+
+    try {
+      setIsClearing(true);
+      const response = await fetch("/api/token/clear", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ type }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Gagal menghapus tokens");
+      }
+
+      setTokens([]);
+    } catch (error) {
+      console.error("Error clearing tokens:", error);
+      alert("Gagal menghapus tokens. Silakan coba lagi.");
+    } finally {
+      setIsClearing(false);
+    }
+  };
 
   return (
     <Card>
@@ -33,9 +67,21 @@ export function TokenList({
             Metadata tersimpan, image dihasilkan saat request create.
           </CardDescription>
         </div>
-        <Badge variant="neutral" className="tracking-[0.24em]">
-          {tokens.length} items
-        </Badge>
+        <div className="flex items-center gap-2">
+          <Badge variant="neutral" className="tracking-[0.24em]">
+            {tokens.length} items
+          </Badge>
+          {tokens.length > 0 && (
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={handleClear}
+              disabled={isClearing}
+            >
+              {isClearing ? "Clearing..." : "Clear"}
+            </Button>
+          )}
+        </div>
       </div>
 
       {tokens.length === 0 ? (
