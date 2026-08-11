@@ -5,7 +5,7 @@ services:
     restart: unless-stopped
 
     ports:
-      - "3000:3000"
+      - "8776:8776"
 
     env_file:
       - .env
