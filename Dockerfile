@@ -21,6 +21,6 @@ RUN npm ci --omit=dev
 
 COPY --from=builder /app ./
 
-EXPOSE 3000
+EXPOSE 8776
 
 CMD ["npm","start"]
