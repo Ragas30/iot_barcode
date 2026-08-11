@@ -44,6 +44,13 @@ const cards = [
     href: "/dashboard/logs",
     cta: "Lihat Log",
   },
+  {
+    title: "Safe History",
+    description:
+      "Pantau brankas yang berhasil dibuka setelah barcode sukses dipindai perangkat.",
+    href: "/dashboard/safe",
+    cta: "Lihat History",
+  },
 ];
 
 export default function DashboardPage() {

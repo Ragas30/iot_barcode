@@ -39,3 +39,14 @@ export type LoginLog = {
   expiresAt: string;
   endedAt: string | null;
 };
+
+export type SafeOpenLog = {
+  id: string;
+  tokenId: string;
+  token: string;
+  tokenName: string;
+  adminId: string;
+  adminName: string;
+  status: "opened";
+  openedAt: string;
+};
