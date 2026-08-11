@@ -17,6 +17,7 @@ export const setupPinSchema = z.object({
 });
 
 export const verifyPinSchema = z.object({
+  adminId: z.string().min(1, "Admin id wajib diisi.").optional(),
   pin: z
     .string()
     .regex(/^\d{4,8}$/, "PIN harus 4-8 digit angka."),

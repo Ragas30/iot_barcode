@@ -7,7 +7,7 @@ type RateLimitEntry = {
 
 const buckets = new Map<string, RateLimitEntry>();
 
-function getClientIp(request: Request) {
+export function getClientIp(request: Request) {
   const forwardedFor = request.headers.get("x-forwarded-for");
   if (forwardedFor) {
     return forwardedFor.split(",")[0]?.trim() ?? "anonymous";

@@ -27,3 +27,15 @@ export type TokenRecord = {
   createdAt: string;
   expiredAt: string;
 };
+
+export type LoginLog = {
+  id: string;
+  adminId: string;
+  name: string;
+  email: string;
+  ip: string | null;
+  userAgent: string | null;
+  createdAt: string;
+  expiresAt: string;
+  endedAt: string | null;
+};

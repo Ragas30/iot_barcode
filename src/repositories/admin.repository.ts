@@ -98,6 +98,107 @@ export class AdminRepository {
     }
   }
 
+  async create(admin: Admin) {
+    try {
+      const db = getDb();
+
+      if (!db) {
+        memoryAdmins.set(admin.email, admin);
+        return admin;
+      }
+
+      await db.collection("admins").doc(admin.id).set(admin);
+      return admin;
+    } catch (error) {
+      const detail =
+        error instanceof Error && error.message
+          ? ` Detail: ${error.message}`
+          : "";
+      throw new DatabaseError(`Gagal membuat admin.${detail}`);
+    }
+  }
+
+  async findAll() {
+    try {
+      const db = getDb();
+
+      if (!db) {
+        await ensureSeededAdmin();
+        return Array.from(memoryAdmins.values()).sort((a, b) =>
+          b.createdAt.localeCompare(a.createdAt),
+        );
+      }
+
+      const snapshot = await db.collection("admins").get();
+      return snapshot.docs
+        .map((doc) => doc.data() as Admin)
+        .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+    } catch (error) {
+      const detail =
+        error instanceof Error && error.message
+          ? ` Detail: ${error.message}`
+          : "";
+      throw new DatabaseError(`Gagal mengambil daftar admin.${detail}`);
+    }
+  }
+
+  async update(id: string, admin: Admin) {
+    try {
+      const db = getDb();
+
+      if (!db) {
+        const existing = Array.from(memoryAdmins.values()).find(
+          (item) => item.id === id,
+        );
+
+        if (!existing) {
+          return null;
+        }
+
+        memoryAdmins.delete(existing.email);
+        memoryAdmins.set(admin.email, admin);
+        return admin;
+      }
+
+      await db.collection("admins").doc(id).set(admin);
+      return admin;
+    } catch (error) {
+      const detail =
+        error instanceof Error && error.message
+          ? ` Detail: ${error.message}`
+          : "";
+      throw new DatabaseError(`Gagal memperbarui admin.${detail}`);
+    }
+  }
+
+  async delete(id: string) {
+    try {
+      const db = getDb();
+
+      if (!db) {
+        const admin = Array.from(memoryAdmins.values()).find(
+          (item) => item.id === id,
+        );
+
+        if (!admin) {
+          return false;
+        }
+
+        memoryAdmins.delete(admin.email);
+        return true;
+      }
+
+      await db.collection("admins").doc(id).delete();
+      return true;
+    } catch (error) {
+      const detail =
+        error instanceof Error && error.message
+          ? ` Detail: ${error.message}`
+          : "";
+      throw new DatabaseError(`Gagal menghapus admin.${detail}`);
+    }
+  }
+
   async findById(id: string) {
     try {
       const db = getDb();

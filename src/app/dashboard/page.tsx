@@ -30,6 +30,20 @@ const cards = [
     href: "/dashboard/pin",
     cta: "Atur PIN",
   },
+  {
+    title: "Manajemen User",
+    description:
+      "Tambahkan akun admin baru atau hapus akun yang sudah tidak dipakai.",
+    href: "/dashboard/users",
+    cta: "Kelola User",
+  },
+  {
+    title: "Login Log",
+    description:
+      "Lihat siapa yang sedang login dan riwayat login tiap user beserta perangkatnya.",
+    href: "/dashboard/logs",
+    cta: "Lihat Log",
+  },
 ];
 
 export default function DashboardPage() {

@@ -25,6 +25,36 @@ export class TokenRepository {
     }
   }
 
+  async deleteByAdmin(adminId: string) {
+    try {
+      const db = getDb();
+
+      if (!db) {
+        for (const [key, record] of Array.from(memoryTokens.entries())) {
+          if (record.adminId === adminId) {
+            memoryTokens.delete(key);
+          }
+        }
+        return;
+      }
+
+      const snapshot = await db
+        .collection("tokens")
+        .where("adminId", "==", adminId)
+        .get();
+
+      const batch = db.batch();
+      snapshot.docs.forEach((doc) => batch.delete(doc.ref));
+      await batch.commit();
+    } catch (error) {
+      const detail =
+        error instanceof Error && error.message
+          ? ` Detail: ${error.message}`
+          : "";
+      throw new DatabaseError(`Gagal menghapus token milik admin.${detail}`);
+    }
+  }
+
   async findByToken(token: string) {
     try {
       const db = getDb();

@@ -14,9 +14,13 @@ export async function GET(request: Request) {
   try {
     enforceRateLimit(request, "verify-pin", 120, 60_000);
     const { searchParams } = new URL(request.url);
+    const adminId = searchParams.get("adminId");
     const pin = searchParams.get("pin");
-    
-    const data = await controller.verifyPin({ pin });
+
+    const data = await controller.verifyPin({
+      adminId: adminId ?? undefined,
+      pin,
+    });
     return successResponse("PIN valid.", data, 200, request);
   } catch (error) {
     return handleRouteError(error, {
