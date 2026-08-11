@@ -1,16 +1,51 @@
+"use client";
+
+import { useState } from "react";
 import type { SafeOpenLog } from "@/src/types/entities";
 import { Card, CardTitle, CardDescription } from "@/src/components/ui/card";
 import { Badge } from "@/src/components/ui/badge";
 import { EmptyState } from "@/src/components/ui/empty-state";
+import { Button } from "@/src/components/ui/button";
 
 function formatDate(value: string) {
   return new Intl.DateTimeFormat("id-ID", {
     dateStyle: "medium",
     timeStyle: "short",
+    timeZone: "Asia/Jakarta",
   }).format(new Date(value));
 }
 
-export function SafeLogList({ logs }: { logs: SafeOpenLog[] }) {
+export function SafeLogList({ logs: initialLogs }: { logs: SafeOpenLog[] }) {
+  const [logs, setLogs] = useState(initialLogs);
+  const [isClearing, setIsClearing] = useState(false);
+
+  const handleClear = async () => {
+    if (!confirm("Apakah Anda yakin ingin menghapus semua riwayat buka brankas?")) {
+      return;
+    }
+
+    try {
+      setIsClearing(true);
+      const response = await fetch("/api/safe/logs", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Gagal menghapus riwayat brankas");
+      }
+
+      setLogs([]);
+    } catch (error) {
+      console.error("Error clearing safe logs:", error);
+      alert("Gagal menghapus riwayat brankas. Silakan coba lagi.");
+    } finally {
+      setIsClearing(false);
+    }
+  };
+
   return (
     <Card>
       <div className="flex items-center justify-between gap-4">
@@ -21,9 +56,21 @@ export function SafeLogList({ logs }: { logs: SafeOpenLog[] }) {
             dipindai dan divalidasi.
           </CardDescription>
         </div>
-        <Badge variant="success" className="tracking-[0.24em]">
-          {logs.length} kali
-        </Badge>
+        <div className="flex items-center gap-2">
+          <Badge variant="success" className="tracking-[0.24em]">
+            {logs.length} kali
+          </Badge>
+          {logs.length > 0 && (
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={handleClear}
+              disabled={isClearing}
+            >
+              {isClearing ? "Clearing..." : "Clear"}
+            </Button>
+          )}
+        </div>
       </div>
 
       {logs.length === 0 ? (

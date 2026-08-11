@@ -41,4 +41,8 @@ export class SafeService {
   async listLogs(limit = 100) {
     return this.safeLogRepository.listRecent(limit);
   }
+
+  async clearLogs() {
+    return this.safeLogRepository.clearAll();
+  }
 }

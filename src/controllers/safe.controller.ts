@@ -12,4 +12,8 @@ export class SafeController {
   async listLogs() {
     return this.safeService.listLogs();
   }
+
+  async clearLogs() {
+    return this.safeService.clearLogs();
+  }
 }

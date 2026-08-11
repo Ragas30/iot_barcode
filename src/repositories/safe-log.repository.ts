@@ -50,4 +50,37 @@ export class SafeLogRepository {
       throw new DatabaseError(`Gagal mengambil log brankas.${detail}`);
     }
   }
+
+  async clearAll() {
+    try {
+      const db = getDb();
+
+      if (!db) {
+        const deletedCount = memoryLogs.size;
+        memoryLogs.clear();
+        return { deletedCount };
+      }
+
+      const snapshot = await db.collection("safe_logs").get();
+      const batch = db.batch();
+      let deletedCount = 0;
+
+      snapshot.docs.forEach((doc) => {
+        batch.delete(doc.ref);
+        deletedCount += 1;
+      });
+
+      if (deletedCount > 0) {
+        await batch.commit();
+      }
+
+      return { deletedCount };
+    } catch (error) {
+      const detail =
+        error instanceof Error && error.message
+          ? ` Detail: ${error.message}`
+          : "";
+      throw new DatabaseError(`Gagal menghapus log brankas.${detail}`);
+    }
+  }
 }

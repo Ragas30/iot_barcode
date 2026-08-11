@@ -1,3 +1,4 @@
+import { NextRequest, NextResponse } from "next/server";
 import { SafeController } from "@/src/controllers/safe.controller";
 import { createCorsPreflightResponse } from "@/src/lib/cors";
 import { enforceRateLimit } from "@/src/lib/rate-limit";
@@ -16,11 +17,38 @@ export async function GET(request: Request) {
     enforceRateLimit(request, "safe-logs", 60, 60_000);
     await requireAuth();
     const data = await controller.listLogs();
-    return successResponse("Riwayat buka brankas berhasil diambil.", data, 200, request);
+    return successResponse(
+      "Riwayat buka brankas berhasil diambil.",
+      data,
+      200,
+      request,
+    );
   } catch (error) {
     return handleRouteError(error, {
       endpoint: "/api/safe/logs",
       method: "GET",
+      request,
+    });
+  }
+}
+
+export async function DELETE(request: NextRequest) {
+  try {
+    await requireAuth();
+    const result = await controller.clearLogs();
+
+    return NextResponse.json(
+      {
+        success: true,
+        message: "Riwayat buka brankas berhasil dibersihkan.",
+        deletedCount: result.deletedCount,
+      },
+      { status: 200 },
+    );
+  } catch (error) {
+    return handleRouteError(error, {
+      endpoint: "/api/safe/logs",
+      method: "DELETE",
       request,
     });
   }
